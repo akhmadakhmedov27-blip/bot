@@ -5,27 +5,9 @@
 // ─────────────────────────────────────────────
 const http = require('http');
 const PORT = process.env.PORT || 3000;
-const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://bot-trading-jvxk.onrender.com';
-
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('✅ TradePro Bot is running!');
-});
-
 server.listen(PORT, () => {
   console.log(`🌐 HTTP server listening on port ${PORT}`);
 });
-
-if (RENDER_URL) {
-  setInterval(() => {
-    http.get(RENDER_URL, (res) => {
-      console.log(`🔄 Self-ping: ${res.statusCode} — ${new Date().toISOString()}`);
-    }).on('error', (err) => {
-      console.error('⚠️ Self-ping error:', err.message);
-    });
-  }, 7 * 60 * 1000); // har 7 daqiqada
-}
-
 require('dotenv').config();
 const { Telegraf, Markup, Scenes, session } = require('telegraf');
 const mongoose = require('mongoose');
@@ -38,7 +20,7 @@ const MONGO_URI    = process.env.MONGO_URI    || 'mongodb+srv://akhmad1232131231
 const ADMIN_ID     = process.env.ADMIN_ID ? parseInt(process.env.ADMIN_ID, 10) : 8665643147;
 const EXNESS_LINK  = process.env.EXNESS_REF_LINK || 'https://one.exnessonelink.com/a/3a6rcif6lv';
 const CHANNEL_LINK = process.env.CHANNEL_LINK || 'https://t.me/axmadostrade';
-const ADMIN_USERNAME = '@AXMV12';
+const ADMIN_USERNAME = '@retestbuyGold';
 
 if (!BOT_TOKEN) { console.error('❌  BOT_TOKEN is missing in .env'); process.exit(1); }
 
@@ -235,7 +217,7 @@ const LOCALES = {
     lesson_bought: '✅ Курс разблокирован!',
     course_locked_msg: (price, xp) => `🔒 *Курс заблокирован*\n\nЦена: *${price} XP*\nВаш баланс: *${xp} XP*\n\n_Зарабатывайте XP через квизы и активность\\!_`,
     signals_title: '📈 Последние сигналы',
-    no_signals: 'Сигналы тут \n https://t.me/+s1EtZ6KTxtsxZWYy',
+    no_signals: 'Сигналы тут \n https://t.me/+FwK_WZCo3JRlZDE6',
     need_verification: '⚠️ Пожалуйста, сначала пройдите верификацию Exness.',
     register_prompt_title: '🚀 Пройдите регистрацию',
     register_prompt_text: 'Чтобы получить доступ ко всем разделам, зарегистрируйтесь в Exness по кнопке ниже и отправьте подтверждение.',
@@ -359,7 +341,7 @@ const LOCALES = {
     lesson_bought: '✅ Course unlocked!',
     course_locked_msg: (price, xp) => `🔒 *Course Locked*\n\nPrice: *${price} XP*\nYour balance: *${xp} XP*\n\n_Earn XP through quizzes and activity\\!_`,
     signals_title: '📈 Latest Signals',
-    no_signals: 'Signals \n https://t.me/+s1EtZ6KTxtsxZWYy',
+    no_signals: 'Signals \n https://t.me/+FwK_WZCo3JRlZDE6',
     need_verification: '⚠️ Please complete Exness verification first.',
     already_registered: '✅ You are already registered. Use the menu.',
     admin_contact: `👑 *Administrator*\n\nIf you have questions or issues, contact the admin:\n\n📩 ${ADMIN_USERNAME}\n\n_Click the username to message\\._`,
@@ -467,7 +449,7 @@ const LOCALES = {
     lesson_bought: '✅ Kurs ochildi!',
     course_locked_msg: (price, xp) => `🔒 *Kurs qulflangan*\n\nNarxi: *${price} XP*\nSizning balansiz: *${xp} XP*\n\n_XP to'plash uchun testlarni bajaring\\!_`,
     signals_title: "📈 So'nggi signallar",
-    no_signals: "Signalar \n https://t.me/+s1EtZ6KTxtsxZWYy",
+    no_signals: "Signalar \n https://t.me/+FwK_WZCo3JRlZDE6",
     need_verification: "⚠️ Avval Exness verifikatsiyasidan o'ting.",
     already_registered: "✅ Siz allaqachon ro'yxatdan o'tgansiz. Menyudan foydalaning.",
     admin_contact: `👑 *Administrator*\n\nSavollaringiz bo'lsa admin bilan bog'laning:\n\n📩 ${ADMIN_USERNAME}\n\n_Username bosib xabar yuboring\\._`,
