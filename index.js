@@ -35,7 +35,7 @@ const mongoose = require('mongoose');
 // ─────────────────────────────────────────────
 const BOT_TOKEN    = process.env.BOT_TOKEN    || "8820876470:AAF4alH7Go7N83JRlfD0oCzlOstVjUea7JA";
 const MONGO_URI    = process.env.MONGO_URI    || 'mongodb+srv://akhmad12321312313:3kINAcgdXW0YdPj5@ahmad.y82yqis.mongodb.net/';
-const ADMIN_ID     = process.env.ADMIN_ID ? parseInt(process.env.ADMIN_ID, 10) : 7553920926;
+const ADMIN_ID     = process.env.ADMIN_ID ? parseInt(process.env.ADMIN_ID, 10) : 8665643147;
 const EXNESS_LINK  = process.env.EXNESS_REF_LINK || 'https://one.exnessonelink.com/a/3a6rcif6lv';
 const CHANNEL_LINK = process.env.CHANNEL_LINK || 'https://t.me/axmadostrade';
 const ADMIN_USERNAME = '@AXMV12';
