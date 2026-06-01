@@ -1432,8 +1432,10 @@ bot.command('courses', async (ctx) => {
 });
 
 // ─────────────────────────────────────────────
-//  SIGNAL WIZARD  ← ЭТО ИЗМЕНЁННАЯ ЧАСТЬ
+//  SIGNAL WIZARD
 // ─────────────────────────────────────────────
+const SIGNAL_CHANNEL_LINK = 'https://t.me/+s1EtZ6KTxtsxZWYy';
+
 const signalWizard = new Scenes.WizardScene(
   'signal_wizard',
 
@@ -1536,6 +1538,15 @@ const signalWizard = new Scenes.WizardScene(
       await new Promise(r => setTimeout(r, 50));
     }
     await ctx.reply(`📡 Сигнал отправлен ${sent} пользователям.`);
+
+    // ✅ НОВОЕ: Отправляем ссылку на сигнал-канал всем верифицированным пользователям
+    const channelMsg = `📢 Наш сигнал канал:\n${SIGNAL_CHANNEL_LINK}`;
+    for (const u of users) {
+      try { await ctx.telegram.sendMessage(u.telegram_id, channelMsg); } catch {}
+      await new Promise(r => setTimeout(r, 50));
+    }
+    await ctx.reply(`✅ Ссылка на канал отправлена ${sent} пользователям.`);
+
     return ctx.scene.leave();
   }
 );
@@ -1617,6 +1628,7 @@ async function main() {
     console.log('🚀 Bot launched successfully!');
     console.log(`👑 Admin ID: ${ADMIN_ID}`);
     console.log(`📢 Channel: ${CHANNEL_LINK}`);
+    console.log(`📡 Signal Channel: ${SIGNAL_CHANNEL_LINK}`);
     console.log(`🧠 Quiz questions loaded: ${QUIZ_QUESTIONS.length}`);
     console.log(`📚 Courses loaded: ${COURSES.length}`);
     console.log(`🔄 Self-ping every 7 minutes: ${RENDER_URL || 'RENDER_EXTERNAL_URL not set'}`);
