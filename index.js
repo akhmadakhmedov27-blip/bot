@@ -3,11 +3,17 @@
 // ─────────────────────────────────────────────
 //  KEEP-ALIVE SERVER (Render 24/7 uchun)
 // ─────────────────────────────────────────────
-const http = require('http');
 const PORT = process.env.PORT || 3000;
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('✅ TradePro Bot is running!');
+});
+
 server.listen(PORT, () => {
   console.log(`🌐 HTTP server listening on port ${PORT}`);
 });
+
 require('dotenv').config();
 const { Telegraf, Markup, Scenes, session } = require('telegraf');
 const mongoose = require('mongoose');
