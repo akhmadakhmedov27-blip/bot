@@ -1,5 +1,7 @@
 'use strict';
 
+const http = require('http'); // ✅ FIXED: was missing, caused ReferenceError
+
 // ─────────────────────────────────────────────
 //  KEEP-ALIVE SERVER (Render 24/7 uchun)
 // ─────────────────────────────────────────────
@@ -27,6 +29,7 @@ const ADMIN_ID     = process.env.ADMIN_ID ? parseInt(process.env.ADMIN_ID, 10) :
 const EXNESS_LINK  = process.env.EXNESS_REF_LINK || 'https://one.exnessonelink.com/a/3a6rcif6lv';
 const CHANNEL_LINK = process.env.CHANNEL_LINK || 'https://t.me/axmadostrade';
 const ADMIN_USERNAME = '@retestbuyGold';
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL || '';
 
 if (!BOT_TOKEN) { console.error('❌  BOT_TOKEN is missing in .env'); process.exit(1); }
 
@@ -1427,7 +1430,6 @@ const SIGNAL_CHANNEL_LINK = 'https://t.me/+s1EtZ6KTxtsxZWYy';
 const signalWizard = new Scenes.WizardScene(
   'signal_wizard',
 
-  // Step 0: Пара
   async (ctx) => {
     if (!isAdmin(ctx)) return ctx.scene.leave();
     ctx.wizard.state.signal = {};
@@ -1435,7 +1437,6 @@ const signalWizard = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
 
-  // Step 1: Направление
   async (ctx) => {
     ctx.wizard.state.signal.pair = ctx.message.text.toUpperCase();
     await ctx.reply('📊 Направление:', Markup.inlineKeyboard([
@@ -1444,12 +1445,10 @@ const signalWizard = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
 
-  // Step 2: Ждём нажатие BUY/SELL
   async (ctx) => {
     if (ctx.message) { await ctx.reply('Нажмите BUY или SELL.'); }
   },
 
-  // Step 3: Вход
   async (ctx) => {
     if (!ctx.message?.text) { return; }
     ctx.wizard.state.signal.entry = ctx.message.text;
@@ -1457,21 +1456,18 @@ const signalWizard = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
 
-  // Step 4: TP
   async (ctx) => {
     ctx.wizard.state.signal.tp = ctx.message.text;
     await ctx.reply('🛡 SL:');
     return ctx.wizard.next();
   },
 
-  // Step 5: SL
   async (ctx) => {
     ctx.wizard.state.signal.sl = ctx.message.text;
     await ctx.reply('💰 Ожидаемые Pips: (или 0)');
     return ctx.wizard.next();
   },
 
-  // Step 6: Pips → спрашиваем доп. текст
   async (ctx) => {
     ctx.wizard.state.signal.pips = ctx.message.text;
     await ctx.reply(
@@ -1481,7 +1477,6 @@ const signalWizard = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
 
-  // Step 7: Получаем доп. текст → сохраняем и рассылаем
   async (ctx) => {
     const extraText = (ctx.message?.text === '/skip') ? '' : (ctx.message?.text || '');
     ctx.wizard.state.signal.extraText = extraText;
@@ -1508,7 +1503,6 @@ const signalWizard = new Scenes.WizardScene(
       sig.pips && sig.pips !== '0' ? `💰 Pips: ${sig.pips}` : '',
     ].filter(Boolean);
 
-    // Добавляем доп. текст если есть
     if (extraText) {
       msgParts.push('');
       msgParts.push(`💬 ${extraText}`);
@@ -1516,7 +1510,6 @@ const signalWizard = new Scenes.WizardScene(
 
     const msg = msgParts.join('\n');
 
-    // Превью для админа
     await ctx.reply(`📋 Пользователям будет отправлено:\n\n${msg}`);
 
     const users = await User.find({ exness_verified: true });
@@ -1527,7 +1520,6 @@ const signalWizard = new Scenes.WizardScene(
     }
     await ctx.reply(`📡 Сигнал отправлен ${sent} пользователям.`);
 
-    // ✅ НОВОЕ: Отправляем ссылку на сигнал-канал всем верифицированным пользователям
     const channelMsg = `📢 Наш сигнал канал:\n${SIGNAL_CHANNEL_LINK}`;
     for (const u of users) {
       try { await ctx.telegram.sendMessage(u.telegram_id, channelMsg); } catch {}
