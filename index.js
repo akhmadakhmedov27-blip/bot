@@ -1431,14 +1431,21 @@ bot.command('courses', async (ctx) => {
   await ctx.reply(`📚 Курсы:\n\n${list}`);
 });
 
+// ─────────────────────────────────────────────
+//  SIGNAL WIZARD  ← ЭТО ИЗМЕНЁННАЯ ЧАСТЬ
+// ─────────────────────────────────────────────
 const signalWizard = new Scenes.WizardScene(
   'signal_wizard',
+
+  // Step 0: Пара
   async (ctx) => {
     if (!isAdmin(ctx)) return ctx.scene.leave();
     ctx.wizard.state.signal = {};
     await ctx.reply('📈 Пара (например: XAUUSD):');
     return ctx.wizard.next();
   },
+
+  // Step 1: Направление
   async (ctx) => {
     ctx.wizard.state.signal.pair = ctx.message.text.toUpperCase();
     await ctx.reply('📊 Направление:', Markup.inlineKeyboard([
@@ -1446,32 +1453,82 @@ const signalWizard = new Scenes.WizardScene(
     ]));
     return ctx.wizard.next();
   },
+
+  // Step 2: Ждём нажатие BUY/SELL
   async (ctx) => {
     if (ctx.message) { await ctx.reply('Нажмите BUY или SELL.'); }
   },
+
+  // Step 3: Вход
   async (ctx) => {
     if (!ctx.message?.text) { return; }
     ctx.wizard.state.signal.entry = ctx.message.text;
     await ctx.reply('🎯 TP:');
     return ctx.wizard.next();
   },
+
+  // Step 4: TP
   async (ctx) => {
     ctx.wizard.state.signal.tp = ctx.message.text;
     await ctx.reply('🛡 SL:');
     return ctx.wizard.next();
   },
+
+  // Step 5: SL
   async (ctx) => {
     ctx.wizard.state.signal.sl = ctx.message.text;
     await ctx.reply('💰 Ожидаемые Pips: (или 0)');
     return ctx.wizard.next();
   },
+
+  // Step 6: Pips → спрашиваем доп. текст
   async (ctx) => {
     ctx.wizard.state.signal.pips = ctx.message.text;
+    await ctx.reply(
+      '✏️ Дополнительное сообщение (необязательно):\n\nНапример: "⚡ Сильный сигнал сегодня! Риск 1%"\n\nИли напишите /skip чтобы пропустить:',
+      Markup.keyboard([['/skip']]).resize().oneTime()
+    );
+    return ctx.wizard.next();
+  },
+
+  // Step 7: Получаем доп. текст → сохраняем и рассылаем
+  async (ctx) => {
+    const extraText = (ctx.message?.text === '/skip') ? '' : (ctx.message?.text || '');
+    ctx.wizard.state.signal.extraText = extraText;
+
     const s = ctx.wizard.state.signal;
-    const sig = await Signal.create(s);
+    const sig = await Signal.create({
+      pair: s.pair,
+      direction: s.direction,
+      entry: s.entry,
+      tp: s.tp,
+      sl: s.sl,
+      pips: s.pips,
+    });
+
     await ctx.reply('✅ Сигнал добавлен!', Markup.removeKeyboard());
+
     const emoji = sig.direction === 'BUY' ? '📈' : '📉';
-    const msg = [`${emoji} ${sig.pair} — ${sig.direction}`, ``, `📌 Вход: ${sig.entry}`, `🎯 TP:   ${sig.tp}`, `🛡 SL:   ${sig.sl}`, sig.pips && sig.pips !== '0' ? `💰 Pips: ${sig.pips}` : ''].filter(Boolean).join('\n');
+    const msgParts = [
+      `${emoji} ${sig.pair} — ${sig.direction}`,
+      ``,
+      `📌 Вход: ${sig.entry}`,
+      `🎯 TP:   ${sig.tp}`,
+      `🛡 SL:   ${sig.sl}`,
+      sig.pips && sig.pips !== '0' ? `💰 Pips: ${sig.pips}` : '',
+    ].filter(Boolean);
+
+    // Добавляем доп. текст если есть
+    if (extraText) {
+      msgParts.push('');
+      msgParts.push(`💬 ${extraText}`);
+    }
+
+    const msg = msgParts.join('\n');
+
+    // Превью для админа
+    await ctx.reply(`📋 Пользователям будет отправлено:\n\n${msg}`);
+
     const users = await User.find({ exness_verified: true });
     let sent = 0;
     for (const u of users) {
